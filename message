@@ -1,0 +1,31 @@
+<?php
+if (isset($_SESSION['isim'])) {
+    $name = $_SESSION['isim'];
+    $watched = $db->prepare("SELECT * FROM anime_watched WHERE anime_adi = '$anime_adi' AND anime_bolum = '$anime_bolum' AND anime_k = '$name'");
+    $watched->execute(array());
+    if ($watched->rowCount() == 0) {
+        echo '<button name="watched" class="btn btn-outline-info hentai-link text-white justify-content-center"><i class="bi-eye"></i> İzlediklerime ekle!</button>';
+    } elseif ($watched->rowCount() > 0) {
+        echo '<button name="unwatched" class="btn btn-outline-danger hentai-link text-white justify-content-center small"><i class="bi-eye-slash"></i> İzledikler. kaldır!</button>';
+    }
+
+    if (isset($_POST['watched'])) {
+        $wadd = $db->prepare("INSERT INTO anime_watched (anime_adi, anime_bolum, anime_k) VALUES (?,?,?)");
+        $wadd->execute(array($anime_adi, $anime_bolum, $name));
+        if (!isset($wadd)) {
+            echo '<a href="iletişim.php"><div class="note note-danger">Hata! lütfen developer ile iletişime geçin!</div></a>';
+        } else {
+            header('Location: hentai-izle.php?anime_adi='.$anime_adi.'&anime_bolum='.$anime_bolum.'');
+        }
+    } elseif (isset($_POST['unwatched'])) {
+        $wdelete = $db->exec("DELETE FROM anime_watched WHERE anime_adi = '$anime_adi' AND anime_bolum = '$anime_bolum' AND anime_k = '$name' ");
+        header('Location: hentai-izle.php?anime_adi='.$anime_adi.'&anime_bolum='.$anime_bolum.'');
+
+    }
+
+} else {
+    echo '<div data-mdb-target="#girisModal" data-mdb-toggle="modal" class="btn btn-outline-info hentai-link text-white justify-content-center"><i class="bi-eye"></i> İzlediklerime ekle!</div>';
+
+}
+
+?>
